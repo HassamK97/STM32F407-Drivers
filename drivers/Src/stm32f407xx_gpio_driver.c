@@ -12,7 +12,7 @@
  *
  * @brief             - This function enables or disables peripheral clock for the given GPIO port
  *
- * @param[in]         - base address of GPIO peripheral
+ * @param[in]         - Base address of GPIO peripheral
  * @param[in]         - ENABLE or DISABLE macros
  *
  * @return            - none
@@ -107,7 +107,7 @@ void vGPIO_PeriClockControl(GPIO_Reg_Def *pGPIOx, uint8_t unEnDis)
  *
  * @brief             - This function initializes the given GPIO pin based various settings like input/output etc.
  *
- * @param[in]         -	handler structure of GPIO
+ * @param[in]         -	Handler structure of GPIO
  *
  * @return            -	void
  *
@@ -116,22 +116,48 @@ void vGPIO_PeriClockControl(GPIO_Reg_Def *pGPIOx, uint8_t unEnDis)
  */
 void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
 {
-	//Enable the peripheral clock
+	uint32_t ulTemp = 0;
+	uint8_t unAltRegIdx, unAltFuncPin;
 
+	//Enable the peripheral clock
+	vGPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
 
 	// Configure mode of GPIO Pin
-
+	if(pGPIOHandle->GPIO_PinConfig.unPinMode <= GPIO_MODE_ANALOG)
+	{
+		// Non interrupt mode
+		ulTemp = (pGPIOHandle->GPIO_PinConfig.unPinMode << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));
+		pGPIOHandle->pGPIOx->MODER &= ~(0x3 << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));	// Clearing current data
+		pGPIOHandle->pGPIOx->MODER |= ulTemp; // Setting new data
+	}
+	else
+	{
+		// Interrupt mode
+	}
 
 	// Configure speed of GPIO Pin
-
+	ulTemp = (pGPIOHandle->GPIO_PinConfig.unPinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));
+	pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));	// Clearing current data
+	pGPIOHandle->pGPIOx->OSPEEDR |= ulTemp; // Setting new data
 
 	// Configure PUPD settings
-
+	ulTemp = (pGPIOHandle->GPIO_PinConfig.unPinPuPdControl << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));
+	pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << (2 * pGPIOHandle->GPIO_PinConfig.unPinNumber));	// Clearing current data
+	pGPIOHandle->pGPIOx->PUPDR |= ulTemp; // Setting new data
 
 	// Configure OP_Type
-
+	ulTemp = (pGPIOHandle->GPIO_PinConfig.unPinOP_Type << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+	pGPIOHandle->pGPIOx->PUPDR &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);	// Clearing current data
+	pGPIOHandle->pGPIOx->PUPDR |= ulTemp; // Setting new data
 
 	// Configure the ALT functionality
+	if(pGPIOHandle->GPIO_PinConfig.unPinAltFuncMode == GPIO_MODE_ALTFN)
+	{
+		unAltRegIdx = (pGPIOHandle->GPIO_PinConfig.unPinNumber / 8);
+		unAltFuncPin = (pGPIOHandle->GPIO_PinConfig.unPinNumber % 8);
+		pGPIOHandle->pGPIOx->AFR[unAltRegIdx] &= ~(0xF << (4 * unAltFuncPin)); // Clearing current data
+		pGPIOHandle->pGPIOx->AFR[unAltRegIdx] |= (pGPIOHandle->GPIO_PinConfig.unPinAltFuncMode << (4 * unAltFuncPin)); // Setting new data
+	}
 }
 
 /*********************************************************************
@@ -139,7 +165,7 @@ void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
  *
  * @brief             -
  *
- * @param[in]         -	base address of GPIO peripheral
+ * @param[in]         -	Base address of GPIO peripheral
  *
  * @return            -	void
  *
@@ -148,7 +174,42 @@ void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
  */
 void vGPIO_DeInit(GPIO_Reg_Def *pGPIOx)
 {
-
+	if(pGPIOx == GPIOA)
+	{
+		GPIOA_REG_RST;
+	}
+	else if(pGPIOx == GPIOB)
+	{
+		GPIOB_REG_RST;
+	}
+	else if(pGPIOx == GPIOC)
+	{
+		GPIOC_REG_RST;
+	}
+	else if(pGPIOx == GPIOD)
+	{
+		GPIOD_REG_RST;
+	}
+	else if(pGPIOx == GPIOE)
+	{
+		GPIOE_REG_RST;
+	}
+	else if(pGPIOx == GPIOF)
+	{
+		GPIOF_REG_RST;
+	}
+	else if(pGPIOx == GPIOG)
+	{
+		GPIOG_REG_RST;
+	}
+	else if(pGPIOx == GPIOH)
+	{
+		GPIOH_REG_RST;
+	}
+	else if(pGPIOx == GPIOI)
+	{
+		GPIOI_REG_RST;
+	}
 }
 
 /*********************************************************************
@@ -156,17 +217,21 @@ void vGPIO_DeInit(GPIO_Reg_Def *pGPIOx)
  *
  * @brief             -
  *
- * @param[in]         -	base address of GPIO peripheral
- * @param[in]         -	pin number of GPIO peripheral port
+ * @param[in]         -	Base address of GPIO peripheral
+ * @param[in]         -	Pin number of GPIO peripheral port
  *
- * @return            -	uint8_t
+ * @return            -	0 or 1
  *
  * @Note              -	None
 
  */
 uint8_t unGPIO_ReadFromInputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
 {
-	return 0;
+	uint8_t unVal = 0;
+
+	unVal = (uint8_t)((pGPIOx->IDR >> unPinNum) & 0x00000001);
+
+	return unVal;
 }
 
 /*********************************************************************
@@ -174,16 +239,21 @@ uint8_t unGPIO_ReadFromInputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
  *
  * @brief             -
  *
- * @param[in]         -	base address of GPIO peripheral
+ * @param[in]         -	Base address of GPIO peripheral
  *
- * @return            -	uint16_t
+ * @return            -	0 - 65535
  *
  * @Note              -	None
 
  */
 uint16_t udGPIO_ReadFromInputPort(GPIO_Reg_Def *pGPIOx)
 {
-	return 0;
+	uint16_t udVal = 0;
+
+	// Reading complete data from the required GPIO port
+	udVal = (uint16_t)(pGPIOx->IDR);
+
+	return udVal;
 }
 
 /*********************************************************************
@@ -191,8 +261,8 @@ uint16_t udGPIO_ReadFromInputPort(GPIO_Reg_Def *pGPIOx)
  *
  * @brief             -
  *
- * @param[in]         -	base address of GPIO peripheral
- * @param[in]         -	pin number of GPIO peripheral port
+ * @param[in]         -	Base address of GPIO peripheral
+ * @param[in]         -	Pin number of GPIO peripheral port
  * @param[in]         - GPIO_PIN_SET or GPIO_PIN_RESET macros
  *
  * @return            -	void
@@ -202,7 +272,16 @@ uint16_t udGPIO_ReadFromInputPort(GPIO_Reg_Def *pGPIOx)
  */
 void vGPIO_WriteToOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum, uint8_t unVal)
 {
-
+	if (unVal == GPIO_PIN_SET)
+	{
+		// Write 1 to the output data register at the bit field of the corresponding pin number
+		pGPIOx->ODR	|= (0x1 << unPinNum);
+	}
+	else
+	{
+		// Write 0 to the output data register at the bit field of the corresponding pin number
+		pGPIOx->ODR	&= ~(0x1 << unPinNum);
+	}
 }
 
 /*********************************************************************
@@ -211,7 +290,7 @@ void vGPIO_WriteToOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum, uint8_t unVa
  * @brief             -
  *
  * @param[in]         -	Base address of GPIO peripheral
- * @param[in]         -	data to write on GPIO peripheral port
+ * @param[in]         -	Data to write on GPIO peripheral port
  *
  * @return            -	void
  *
@@ -220,7 +299,7 @@ void vGPIO_WriteToOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum, uint8_t unVa
  */
 void vGPIO_WriteToOutputPort(GPIO_Reg_Def *pGPIOx, uint16_t udVal)
 {
-
+	pGPIOx->ODR	= (uint32_t)udVal;
 }
 
 /*********************************************************************
@@ -228,7 +307,7 @@ void vGPIO_WriteToOutputPort(GPIO_Reg_Def *pGPIOx, uint16_t udVal)
  *
  * @brief             -
  *
- * @param[in]         -	base address of GPIO peripheral
+ * @param[in]         -	Base address of GPIO peripheral
  * @param[in]         - ENABLE or DISABLE macros
  *
  * @return            -	void
@@ -238,7 +317,7 @@ void vGPIO_WriteToOutputPort(GPIO_Reg_Def *pGPIOx, uint16_t udVal)
  */
 void vGPIO_ToggleOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
 {
-
+	pGPIOx->ODR ^= (0x1 << unPinNum);
 }
 
 /*********************************************************************
@@ -247,7 +326,7 @@ void vGPIO_ToggleOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
  * @brief             -
  *
  * @param[in]         -	GPIO peripheral port pin number on which interrupt requested
- * @param[in]         -	prioroty of the requested interrupt
+ * @param[in]         -	Prioroty of the requested interrupt
  * @param[in]         -	ENABLE or DISABLE macros
  *
  * @return            -	void
