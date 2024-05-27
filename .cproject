@@ -161,7 +161,6 @@
 		<project id="stm32f4xx_drivers.null.915841291" name="stm32f4xx_drivers"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.2138905802;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.2138905802.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1557504064;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.293689938">
@@ -178,5 +177,8 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/stm32f4xx_drivers"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets/>
 	</storageModule>
 </cproject>

@@ -163,7 +163,7 @@ void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
 /*********************************************************************
  * @fn      		  - vGPIO_DeInit
  *
- * @brief             -
+ * @brief             - This function deinitializes the given GPIO settings based on provided GPIO peripheral.
  *
  * @param[in]         -	Base address of GPIO peripheral
  *
@@ -215,7 +215,7 @@ void vGPIO_DeInit(GPIO_Reg_Def *pGPIOx)
 /*********************************************************************
  * @fn      		  - unGPIO_ReadFromInputPin
  *
- * @brief             -
+ * @brief             - Function to read data from GPIO as an input
  *
  * @param[in]         -	Base address of GPIO peripheral
  * @param[in]         -	Pin number of GPIO peripheral port
@@ -259,7 +259,7 @@ uint16_t udGPIO_ReadFromInputPort(GPIO_Reg_Def *pGPIOx)
 /*********************************************************************
  * @fn      		  - vGPIO_WriteToOutputPin
  *
- * @brief             -
+ * @brief             - Function to write data on a GPIO pin
  *
  * @param[in]         -	Base address of GPIO peripheral
  * @param[in]         -	Pin number of GPIO peripheral port
@@ -287,7 +287,7 @@ void vGPIO_WriteToOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum, uint8_t unVa
 /*********************************************************************
  * @fn      		  - vGPIO_WriteToOutputPort
  *
- * @brief             -
+ * @brief             -	Function to write data on a GPIO port
  *
  * @param[in]         -	Base address of GPIO peripheral
  * @param[in]         -	Data to write on GPIO peripheral port
@@ -305,7 +305,7 @@ void vGPIO_WriteToOutputPort(GPIO_Reg_Def *pGPIOx, uint16_t udVal)
 /*********************************************************************
  * @fn      		  - vGPIO_ToggleOutputPin
  *
- * @brief             -
+ * @brief             - Function to toggle the output of GPIO pin
  *
  * @param[in]         -	Base address of GPIO peripheral
  * @param[in]         - ENABLE or DISABLE macros
