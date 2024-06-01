@@ -147,8 +147,8 @@ void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
 
 	// Configure OP_Type
 	ulTemp = (pGPIOHandle->GPIO_PinConfig.unPinOP_Type << pGPIOHandle->GPIO_PinConfig.unPinNumber);
-	pGPIOHandle->pGPIOx->PUPDR &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);	// Clearing current data
-	pGPIOHandle->pGPIOx->PUPDR |= ulTemp; // Setting new data
+	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);	// Clearing current data
+	pGPIOHandle->pGPIOx->OTYPER |= ulTemp; // Setting new data
 
 	// Configure the ALT functionality
 	if(pGPIOHandle->GPIO_PinConfig.unPinAltFuncMode == GPIO_MODE_ALTFN)
