@@ -104,8 +104,8 @@ typedef struct
 {
 	volatile uint32_t CR;			/*!< RCC clock control register										Address offset: 0x00 		*/
 	volatile uint32_t PLLCFGR;		/*!< RCC PLL configuration register									Address offset: 0x04 		*/
-	volatile uint32_t CFGR;			/*!< RCC clock configuration register								Address offset: 0x0C 		*/
-	volatile uint32_t CIR;			/*!< RCC clock interrupt register									Address offset: 0x08 		*/
+	volatile uint32_t CFGR;			/*!< RCC clock configuration register								Address offset: 0x08 		*/
+	volatile uint32_t CIR;			/*!< RCC clock interrupt register									Address offset: 0x0C 		*/
 	volatile uint32_t AHB1RSTR;		/*!< RCC AHB1 peripheral reset register								Address offset: 0x10 		*/
 	volatile uint32_t AHB2RSTR;		/*!< RCC AHB2 peripheral reset register								Address offset: 0x14 		*/
 	volatile uint32_t AHB3RSTR;		/*!< RCC AHB3 peripheral reset register								Address offset: 0x18 		*/
@@ -137,6 +137,26 @@ typedef struct
 }RCC_Reg_Def;
 
 
+typedef struct
+{
+	volatile uint32_t IMR;		/*!< Interrupt Mask Register,          	  	Address offset: 0x00 */
+	volatile uint32_t EMR;		/*!< Event Mask Register,          	  	    Address offset: 0x04 */
+	volatile uint32_t RTSR;		/*!< Rising Trigger Selection Register,     Address offset: 0x08 */
+	volatile uint32_t FTSR;		/*!< Falling Trigger Selection Register,    Address offset: 0x0C */
+	volatile uint32_t SWIER;	/*!< Software Interrupt Event Register,     Address offset: 0x10 */
+	volatile uint32_t PR;		/*!< Pending Register,          	  	    Address offset: 0x14 */
+}EXTI_Reg_Def;
+
+
+typedef struct
+{
+	volatile uint32_t MEMRMP;	 /*!< Memory Remap Register,                      Address offset: 0x00      */
+	volatile uint32_t PMC;		 /*!< Peripheral Mode Configuration Register,     Address offset: 0x04      */
+	volatile uint32_t EXTICR[4]; /*!< External Interrupt Configuration Register,  Address offset: 0x08-0x14 */
+	uint32_t RESERVED1[2];		 /*!< Reserved									  Address offset: 0x18-0x1C */
+	volatile uint32_t CMPCR; 	 /*!< Compensation Cell Control Register,         Address offset: 0x20      */
+}SYSCFG_Reg_Def;
+
 /*
  *	Peripheral Definitions (Peripheral Base Addresses Type Casted to Relevant Register Structure Definitions)
  */
@@ -151,7 +171,21 @@ typedef struct
 #define GPIOI		((GPIO_Reg_Def*) GPIOI_BASEADDR)
 
 #define RCC			((RCC_Reg_Def*)	RCC_BASEADDR)
+#define EXTI		((EXTI_Reg_Def*) EXTI_BASEADDR)
+#define SYSCFG		((SYSCFG_Reg_Def*) SYSCFG_BASEADDR)
 
+/*
+ * Macro to return port code for given base address in the range of 0 to 7
+ */
+#define GPIO_BASEADDR_TO_PORT_CODE(x)   ((x == GPIOA)?0:\
+										(x == GPIOB)?1:\
+										(x == GPIOC)?2:\
+										(x == GPIOD)?3:\
+								        (x == GPIOE)?4:\
+								        (x == GPIOF)?5:\
+								        (x == GPIOG)?6:\
+								        (x == GPIOH)?7: \
+								        (x == GPIOI)?8:0)
 
 /*
  * Clock Enable Macros for GPIOx Peripherals

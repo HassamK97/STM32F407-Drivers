@@ -133,6 +133,35 @@ void vGPIO_Init(GPIO_Handler_t *pGPIOHandle)
 	else
 	{
 		// Interrupt mode
+		if(pGPIOHandle->GPIO_PinConfig.unPinMode <= GPIO_MODE_IT_FT)	// Falling Edge Trigger
+		{
+			// Configure the FTSR
+			EXTI->FTSR |= (1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+			// Clear the corresponding bit on RTSR
+			EXTI->RTSR &= ~(1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+		}
+		else if(pGPIOHandle->GPIO_PinConfig.unPinMode <= GPIO_MODE_IT_RT)	// Rising Edge Trigger
+		{
+			// Configure the RTSR
+			EXTI->RTSR |= (1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+			// Clear the corresponding bit on FTSR
+			EXTI->FTSR &= ~(1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+		}
+		else if(pGPIOHandle->GPIO_PinConfig.unPinMode <= GPIO_MODE_IT_RFT)	// Falling and Rising Edge Trigger
+		{
+			// Configure the FTSR and RTSR
+			EXTI->FTSR |= (1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+			EXTI->RTSR |= (1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
+		}
+
+		// Configure the GPIO port selection in SYSCF EXTICR
+		uint8_t unExticrIndex = pGPIOHandle->GPIO_PinConfig.unPinNumber / 4;
+		uint8_t unExtiPinSel = pGPIOHandle->GPIO_PinConfig.unPinNumber % 4;
+		uint8_t unPortCode = GPIO_BASEADDR_TO_PORT_CODE(pGPIOHandle->pGPIOx);
+		SYSCFG->EXTICR[unExticrIndex] = unPortCode << (unExtiPinSel * 4);
+
+		// Enable the EXTI interrupt delivery using IMR
+		EXTI->IMR |= (1 << pGPIOHandle->GPIO_PinConfig.unPinNumber);
 	}
 
 	// Configure speed of GPIO Pin
