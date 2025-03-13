@@ -352,10 +352,9 @@ void vGPIO_ToggleOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
 /*********************************************************************
  * @fn      		  - vGPIO_IRQConfig
  *
- * @brief             -
+ * @brief             - Configures the interrupt for a specified GPIO pin.
  *
  * @param[in]         -	GPIO peripheral port pin number on which interrupt requested
- * @param[in]         -	Prioroty of the requested interrupt
  * @param[in]         -	ENABLE or DISABLE macros
  *
  * @return            -	void
@@ -363,15 +362,73 @@ void vGPIO_ToggleOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum)
  * @Note              -	None
 
  */
-void vGPIO_IRQConfig(uint8_t unInterruptNum, uint8_t unInterruptPriority, uint8_t unEnDis)
+void vGPIO_IRQConfig(uint8_t unInterruptNum, uint8_t unEnDis)
 {
+	if(unEnDis == ENABLE)
+	{
+		if(unInterruptNum <= 31)
+		{
+			// Program ISER0 register
+			*NVIC_ISER0 |= ( 1 << unInterruptNum );
+		}
+		else if(unInterruptNum > 31 && unInterruptNum < 64 ) //32 to 63
+		{
+			// Program ISER1 register
+			*NVIC_ISER1 |= ( 1 << (unInterruptNum % 32) );
+		}
+		else if(unInterruptNum >= 64 && unInterruptNum < 96 ) //64 to 95
+		{
+			// Program ISER2 register
+			*NVIC_ISER2 |= ( 1 << (unInterruptNum % 64) );
+		}
+	}
+	else
+	{
+		if(unInterruptNum <= 31)
+		{
+			// Program ICER0 register
+			*NVIC_ICER0 |= ( 1 << unInterruptNum );
+		}
+		else if(unInterruptNum > 31 && unInterruptNum < 64 )
+		{
+			// Program ICER1 register
+			*NVIC_ICER1 |= ( 1 << (unInterruptNum % 32) );
+		}
+		else if(unInterruptNum >= 64 && unInterruptNum < 96 )
+		{
+			// Program ICER2 register
+			*NVIC_ICER2 |= ( 1 << (unInterruptNum % 64) );
+		}
+	}
+}
 
+/*********************************************************************
+ * @fn      		  - vGPIO_IRQPriorityConfig
+ *
+ * @brief             - Sets the priority for a specified GPIO interrupt.
+ *
+ * @param[in]         -	GPIO peripheral port pin number on which interrupt requested
+ * @param[in]         -	Prioroty of the requested interrupt
+ *
+ * @return            -	void
+ *
+ * @Note              -	None
+
+ */
+void vGPIO_IRQPriorityConfig(uint8_t unInterruptNum, uint8_t unInterruptPriority)
+{
+	uint8_t unIprx = unInterruptNum / 4;
+	uint8_t unIprxSection  = unInterruptNum % 4 ;
+
+	uint8_t unShiftAmount = (8 * unIprxSection) + (8 - NO_PR_BITS_IMPLEMENTED) ;
+
+	*( NVIC_PR_BASE_ADDR + unIprx) |=  (unInterruptPriority << unShiftAmount);
 }
 
 /*********************************************************************
  * @fn      		  - vGPIO_IRQHandling
  *
- * @brief             -
+ * @brief             - Handles the interrupt for the specified GPIO pin.
  *
  * @param[in]         -	GPIO peripheral port pin number on which interrupt requested
  *
@@ -382,5 +439,10 @@ void vGPIO_IRQConfig(uint8_t unInterruptNum, uint8_t unInterruptPriority, uint8_
  */
 void vGPIO_IRQHandling(uint8_t unInterruptNum)
 {
-
+	// Clear the EXTI pending register corresponding to the pin number
+	if(EXTI->PR & ( 1 << unInterruptNum))
+	{
+		// Clear
+		EXTI->PR |= ( 1 << unInterruptNum);
+	}
 }

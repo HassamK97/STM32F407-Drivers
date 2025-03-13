@@ -116,7 +116,8 @@ void vGPIO_ToggleOutputPin(GPIO_Reg_Def *pGPIOx, uint8_t unPinNum);
 /*
  * IRQ Configuration and ISR Handling
  */
-void vGPIO_IRQConfig(uint8_t unInterruptNum, uint8_t unInterruptPriority, uint8_t unEnDis);
+void vGPIO_IRQConfig(uint8_t unInterruptNum, uint8_t unEnDis);
+void vGPIO_IRQPriorityConfig(uint8_t unInterruptNum, uint8_t unInterruptPriority);
 void vGPIO_IRQHandling(uint8_t unInterruptNum);
 
 #endif /* INC_STM32F407XX_GPIO_DRIVER_H_ */
