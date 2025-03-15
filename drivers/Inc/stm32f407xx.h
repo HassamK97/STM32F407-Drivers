@@ -33,6 +33,40 @@
 #define NVIC_PR_BASE_ADDR 	((volatile uint32_t*)0xE000E400)
 
 /*
+ * All the possible NVIC priority levels
+ */
+#define NVIC_IRQ_PRI0      0
+#define NVIC_IRQ_PRI1      1
+#define NVIC_IRQ_PRI2      2
+#define NVIC_IRQ_PRI3      3
+#define NVIC_IRQ_PRI4      4
+#define NVIC_IRQ_PRI5      5
+#define NVIC_IRQ_PRI6      6
+#define NVIC_IRQ_PRI7      7
+#define NVIC_IRQ_PRI8      8
+#define NVIC_IRQ_PRI9      9
+#define NVIC_IRQ_PRI10    10
+#define NVIC_IRQ_PRI11    11
+#define NVIC_IRQ_PRI12    12
+#define NVIC_IRQ_PRI13    13
+#define NVIC_IRQ_PRI14    14
+#define NVIC_IRQ_PRI15    15
+
+/*
+ * IRQ(Interrupt Request) Numbers of STM32F407x MCU
+ */
+#define IRQ_NO_EXTI0 		6
+#define IRQ_NO_EXTI1 		7
+#define IRQ_NO_EXTI2 		8
+#define IRQ_NO_EXTI3 		9
+#define IRQ_NO_EXTI4 		10
+#define IRQ_NO_EXTI9_5 		23
+#define IRQ_NO_EXTI15_10 	40
+#define IRQ_NO_SPI1			35
+#define IRQ_NO_SPI2         36
+#define IRQ_NO_SPI3         51
+
+/*
  * ARM Cortex Mx Processor number of priority bits implemented in Priority Register
  */
 #define NO_PR_BITS_IMPLEMENTED  4

@@ -1,13 +1,17 @@
 /*
- * led_btn_ctrl.c
+ * button_interrupt_ctrl.c
  *
- *  Created on: Jun 2, 2024
+ *  Created on: Mar 16, 2025
  *      Author: Hassam
  */
 
+#include <string.h>
 #include "stm32f407xx.h"
 #include "stm32f407xx_gpio_driver.h"
 
+#define HIGH 			1
+#define LOW 			0
+#define BTN_PRESSED 	LOW
 
 /*********************************************************************
  * @fn      		  - vDelay
@@ -42,6 +46,9 @@ int main (void)
 {
 	GPIO_Handler_t stGpioLed, stGpioBtn;
 
+	memset(&stGpioLed, 0, sizeof(stGpioLed));
+	memset(&stGpioBtn, 0, sizeof(stGpioBtn));
+
 	stGpioLed.pGPIOx = GPIOD;
 	stGpioLed.GPIO_PinConfig.unPinMode = GPIO_MODE_OUT;
 	stGpioLed.GPIO_PinConfig.unPinNumber = GPIO_PIN_15;
@@ -52,26 +59,27 @@ int main (void)
 	vGPIO_Init(&stGpioLed);	/* Initializing the GPIO For LED */
 
 	stGpioBtn.pGPIOx = GPIOA;
-	stGpioBtn.GPIO_PinConfig.unPinMode = GPIO_MODE_IN;
+	stGpioBtn.GPIO_PinConfig.unPinMode = GPIO_MODE_IT_FT;
 	stGpioBtn.GPIO_PinConfig.unPinNumber = GPIO_PIN_0;
 	stGpioBtn.GPIO_PinConfig.unPinSpeed = GPIO_SPEED_HIGH;
 	stGpioBtn.GPIO_PinConfig.unPinPuPdControl = GPIO_PIN_NO_PUPD;
 
 	vGPIO_Init(&stGpioBtn); /* Initializing the GPIO For Button */
 
-	while(1)
-	{
-		/* LED will turn on when the button is pressed */
-		if(unGPIO_ReadFromInputPin(stGpioBtn.pGPIOx, GPIO_PIN_0) == ENABLE)
-		{
-			vGPIO_WriteToOutputPin(stGpioLed.pGPIOx, GPIO_PIN_15, ENABLE);
-			vDelay();
-		}
-		vGPIO_WriteToOutputPin(stGpioLed.pGPIOx, GPIO_PIN_15, DISABLE);
-	}
+	vGPIO_WriteToOutputPin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+
+	// IRQ Configurations
+	vGPIO_IRQPriorityConfig(IRQ_NO_EXTI0, NVIC_IRQ_PRI15);
+	vGPIO_IRQConfig(IRQ_NO_EXTI0, ENABLE);
+
+	while(1);
 
 	return 0;
 }
 
-
-
+void EXTI0_IRQHandler(void)
+{
+	vDelay(); /* Added 200ms delay to account for button de-bouncing */
+	vGPIO_IRQHandling(GPIO_PIN_0);
+	vGPIO_ToggleOutputPin(GPIOD, GPIO_PIN_15);
+}
